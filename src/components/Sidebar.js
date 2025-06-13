@@ -31,11 +31,11 @@ function Sidebar({ onLogout }) {
                         <FaMoneyBill /> <span>Sales</span>
                     </Link>
                 </li>
-                 <li className={pathname === '/order' ? 'active' : ''}>
+                 {/* <li className={pathname === '/order' ? 'active' : ''}>
                     <Link to="/order">
                         <FaJediOrder /> <span>Orders</span>
                     </Link>
-                </li>
+                </li> */}
                 <li className={pathname === '/reports' ? 'active' : ''}>
                     <Link to="/reports">
                         <FaChartLine /> <span>Reports</span>

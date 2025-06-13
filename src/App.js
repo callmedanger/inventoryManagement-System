@@ -112,14 +112,14 @@ function App() {
                 </PrivateRoute>
               }
             />
-            <Route
+            {/* <Route
               path="/order"
               element={
                 <PrivateRoute isAuthenticated={isAuthenticated}>
                   <OrderTable />
                 </PrivateRoute>
               }
-            />
+            /> */}
             <Route
               path="/reports"
               element={
