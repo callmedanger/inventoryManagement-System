@@ -1,0 +1,19 @@
+.report-page {
+  /* margin-left: 220px; Sidebar offset */
+  padding: 2rem;
+  min-height: 100vh;
+  background-color: #f9f9f9;
+  box-sizing: border-box;
+}
+
+.report-heading {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.report-subtext {
+  font-size: 1rem;
+  color: #666;
+}

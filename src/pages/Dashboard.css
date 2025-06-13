@@ -1,0 +1,79 @@
+.dashboard {
+  /* margin-left: 220px; to offset fixed sidebar */
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Card Grid Section */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.card {
+  background: #ffffff;
+  padding: 1rem 1.2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.card h4 {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+}
+
+.card span {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Color Indicators */
+.card.blue {
+  border-left: 5px solid #2980b9;
+}
+
+.card.green {
+  border-left: 5px solid #2ecc71;
+}
+
+/* Card Variants */
+.card.large {
+  grid-column: span 2;
+  min-height: 150px;
+}
+
+.card.empty {
+  text-align: center;
+  color: #999;
+}
+
+/* Reports Section */
+.reports {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.reports button {
+  background: #f4f4f4;
+  padding: 0.7rem 1.1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.reports button:hover {
+  background: #eaeaea;
+  border-color: #bbb;
+}

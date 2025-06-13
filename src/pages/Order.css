@@ -1,0 +1,154 @@
+.order-table-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px;
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+
+.table-header {
+    display: flex;
+    padding: 15px 10px;
+    border-bottom: 1px solid #eee;
+    background-color: #f9f9f9;
+    font-weight: bold;
+    color: #666;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.header-item {
+    flex: 1;
+    text-align: left;
+    padding: 0 10px;
+}
+
+.table-row {
+    display: flex;
+    align-items: center;
+    padding: 15px 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.table-row:last-child {
+    border-bottom: none;
+}
+
+.row-item {
+    flex: 1;
+    text-align: left;
+    padding: 0 10px;
+}
+
+.id-column {
+    max-width: 50px; /* Adjust as needed */
+}
+
+.full-name-column {
+    display: flex;
+    align-items: center;
+}
+
+.avatar {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #a7a7a7; /* Gray background for the avatar */
+    color: #fff;
+    font-weight: bold;
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+.order-details-button {
+    background-color: #6a0dad; /* Purple color */
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.order-details-button:hover {
+    background-color: #5a0c9a; /* Darker purple on hover */
+}
+
+.table-footer {
+    display: flex;
+    justify-content: flex-end; /* Align to the right */
+    align-items: center;
+    padding: 15px 10px;
+    border-top: 1px solid #eee;
+    margin-top: 10px;
+    color: #666;
+}
+
+.pagination-info {
+    margin-right: 20px;
+}
+
+.pagination-controls button {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    color: #666;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 5px;
+    font-weight: bold;
+}
+
+.pagination-controls button:hover {
+    background-color: #e0e0e0;
+}
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
