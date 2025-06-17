@@ -1,19 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Product.css';
 import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa';
+import axios from 'axios';
 
 function Product() {
-  const initialProducts = [
-    { name: 'Laptop Dell XPS', sku: 'LPT001', category: 'Electronics', quantity: 25, price: '$999.99' },
-    { name: 'iPhone 15 Pro', sku: 'IPH001', category: 'Electronics', quantity: 15, price: '$1199.99' },
-    { name: 'Gaming Chair', sku: 'CHR001', category: 'Furniture', quantity: 8, price: '$299.99' },
-    { name: 'Wireless Mouse', sku: 'MOU001', category: 'Accessories', quantity: 50, price: '$29.99' },
-    { name: 'Monitor 4K', sku: 'MON001', category: 'Electronics', quantity: 12, price: '$399.99' },
-  ];
-
-  const [products, setProducts] = useState(initialProducts);
-  const [filteredProducts, setFilteredProducts] = useState(initialProducts);
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [newProduct, setNewProduct] = useState({
     name: '',
     sku: '',
@@ -21,23 +15,72 @@ function Product() {
     quantity: '',
     price: '',
   });
-  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleAddProduct = () => {
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    category: '',
+    quantity: '',
+    price: ''
+  });
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/products/all', { withCredentials: true });
+      setProducts(res.data);
+      setFilteredProducts(res.data);
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      alert('Failed to load products.');
+    }
+  };
+
+  const handleAddProduct = async () => {
     const { name, sku, category, quantity, price } = newProduct;
     if (!name || !sku || !category || !quantity || !price) {
-      alert('All fields are required!');
+      alert('Please fill in all fields!');
       return;
     }
 
-    const updatedList = [
-      ...products,
-      { ...newProduct, quantity: Number(quantity) }
-    ];
-    setProducts(updatedList);
-    setFilteredProducts(updatedList);
-    setNewProduct({ name: '', sku: '', category: '', quantity: '', price: '' });
-    setShowModal(false);
+    try {
+      const res = await axios.post('http://localhost:5000/api/products/add', {
+        name, sku, category, quantity: Number(quantity), price,
+      });
+
+      if (res.status === 200) {
+        alert('Product added successfully!');
+        setNewProduct({ name: '', sku: '', category: '', quantity: '', price: '' });
+        setShowModal(false);
+        fetchProducts();
+      } else {
+        alert(res.data.error || 'Failed to add product.');
+      }
+    } catch (err) {
+      console.error('Add product error:', err);
+      alert('Server error.');
+    }
+  };
+
+  const handleDeleteProduct = async (sku) => {
+    const confirmDelete = window.confirm(`Are you sure to delete SKU: ${sku}?`);
+    if (!confirmDelete) return;
+
+    try {
+      const res = await axios.delete(`http://localhost:5000/api/products/${sku}`, { withCredentials: true });
+      if (res.status === 200) {
+        alert('Product deleted successfully!');
+        fetchProducts(); // Refresh list
+      } else {
+        alert(res.data.error || 'Failed to delete product.');
+      }
+    } catch (err) {
+      console.error('Delete error:', err);
+      alert('Server error.');
+    }
   };
 
   const handleSearch = (e) => {
@@ -57,10 +100,37 @@ function Product() {
     return 'In Stock';
   };
 
-  const getStatusClass = (status) => {
-    if (status === 'Low Stock') return 'status low';
-    if (status === 'Medium Stock') return 'status medium';
-    return 'status in';
+  const getStatusClass = (quantity) => {
+    if (quantity <= 10) return 'status-circle red';
+    return 'status-circle green';
+  };
+
+  const handleUpdateProduct = async () => {
+    const { name, category, quantity, price } = editForm;
+    if (!name || !category || !quantity || !price) {
+      alert('Please fill in all fields!');
+      return;
+    }
+
+    try {
+      const res = await axios.put(`http://localhost:5000/api/products/${editingProduct.sku}`, {
+        name,
+        category,
+        quantity: Number(quantity),
+        price
+      });
+
+      if (res.status === 200) {
+        alert('Product updated successfully!');
+        setEditingProduct(null);
+        fetchProducts();
+      } else {
+        alert(res.data.error || 'Update failed.');
+      }
+    } catch (err) {
+      console.error('Update error:', err);
+      alert('Server error.');
+    }
   };
 
   return (
@@ -105,10 +175,24 @@ function Product() {
                   <td>{item.category}</td>
                   <td>{item.quantity}</td>
                   <td>{item.price}</td>
-                  <td><span className={getStatusClass(status)}>{status}</span></td>
+                  <td><span className={getStatusClass(item.quantity)}>{status}</span></td>
                   <td>
-                    <FaEdit className="action-icon edit" />
-                    <FaTrash className="action-icon delete" />
+                    <FaEdit
+                      className="action-icon edit"
+                      onClick={() => {
+                        setEditingProduct(item);
+                        setEditForm({
+                          name: item.name,
+                          category: item.category,
+                          quantity: item.quantity,
+                          price: item.price
+                        });
+                      }}
+                    />
+                    <FaTrash
+                      className="action-icon delete"
+                      onClick={() => handleDeleteProduct(item.sku)}
+                    />
                   </td>
                 </tr>
               );
@@ -119,45 +203,56 @@ function Product() {
         </tbody>
       </table>
 
-      {/* Modal */}
+      {/* Modal for Adding Product */}
       {showModal && (
         <div className="modal-backdrop">
           <div className="modal">
             <h3>Add Product</h3>
+            <input type="text" placeholder="Product Name" value={newProduct.name} onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} />
+            <input type="text" placeholder="SKU" value={newProduct.sku} onChange={(e) => setNewProduct({ ...newProduct, sku: e.target.value })} />
+            <input type="text" placeholder="Category" value={newProduct.category} onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })} />
+            <input type="number" placeholder="Quantity" value={newProduct.quantity} onChange={(e) => setNewProduct({ ...newProduct, quantity: e.target.value })} />
+            <input type="text" placeholder="Price" value={newProduct.price} onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} />
+            <div className="modal-actions">
+              <button onClick={handleAddProduct} className="add-btn">Add</button>
+              <button onClick={() => setShowModal(false)} className="cancel-btn">Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal for Editing Product */}
+      {editingProduct && (
+        <div className="modal-backdrop">
+          <div className="modal">
+            <h3>Edit Product (SKU: {editingProduct.sku})</h3>
             <input
               type="text"
               placeholder="Product Name"
-              value={newProduct.name}
-              onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-            />
-            <input
-              type="text"
-              placeholder="SKU"
-              value={newProduct.sku}
-              onChange={(e) => setNewProduct({ ...newProduct, sku: e.target.value })}
+              value={editForm.name}
+              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
             />
             <input
               type="text"
               placeholder="Category"
-              value={newProduct.category}
-              onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+              value={editForm.category}
+              onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
             />
             <input
               type="number"
               placeholder="Quantity"
-              value={newProduct.quantity}
-              onChange={(e) => setNewProduct({ ...newProduct, quantity: e.target.value })}
+              value={editForm.quantity}
+              onChange={(e) => setEditForm({ ...editForm, quantity: e.target.value })}
             />
             <input
               type="text"
               placeholder="Price"
-              value={newProduct.price}
-              onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+              value={editForm.price}
+              onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
             />
-
             <div className="modal-actions">
-              <button onClick={handleAddProduct} className="add-btn">Add</button>
-              <button onClick={() => setShowModal(false)} className="cancel-btn">Cancel</button>
+              <button onClick={handleUpdateProduct} className="add-btn">Update</button>
+              <button onClick={() => setEditingProduct(null)} className="cancel-btn">Cancel</button>
             </div>
           </div>
         </div>

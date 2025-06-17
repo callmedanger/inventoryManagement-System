@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaHome, FaBox, FaMoneyBill, FaChartLine, FaSignOutAlt, FaJediOrder } from 'react-icons/fa';
+import { FaHome, FaBox, FaMoneyBill, FaChartLine, FaSignOutAlt, FaRegFileAlt, FaChartBar } from 'react-icons/fa';
 import '../components/Sidebar.css';
 
 function Sidebar({ onLogout }) {

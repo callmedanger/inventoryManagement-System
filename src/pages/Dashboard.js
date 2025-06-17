@@ -35,7 +35,8 @@
 // export default Dashboard;
 
 // src/App.js
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { FaCube, FaDollarSign, FaChartLine, FaRegFileAlt, FaChartBar } from 'react-icons/fa';
 
 const styles = {
@@ -191,10 +192,46 @@ function App() {
   const totalForBarCalculation = Math.abs(cashIn) + Math.abs(cashOut);
   const clampedPercentage = totalForBarCalculation > 0 ? (netCashFlow / totalForBarCalculation) * 100 : 0;
 
-  const renderStatCard = (title, value, description, icon) => (
+  const [productCount, setProductCount] = useState(0);
+  const [inventoryValue, setInventoryValue] = useState(0);
+  const [lowStockCount, setLowStockCount] = useState(0);
+
+  useEffect(() => {
+    // Fetch product count from backend
+    axios.get('http://localhost:5000/api/products/count')
+      .then(response => {
+        console.log('Product count fetched:', response.data.count); // Debugging log
+        setProductCount(response.data.count);
+      })
+      .catch(error => {
+        console.error('Error fetching product count:', error);
+      });
+
+    // Fetch total inventory value from backend
+    axios.get('http://localhost:5000/api/products/inventory-value')
+      .then(response => {
+        console.log('Inventory value fetched:', response.data.totalValue); // Debugging log
+        setInventoryValue(response.data.totalValue);
+      })
+      .catch(error => {
+        console.error('Error fetching inventory value:', error);
+      });
+
+    // Fetch low stock count from backend
+    axios.get('http://localhost:5000/api/products/low-stock')
+      .then(response => {
+        console.log('Low stock count fetched:', response.data.lowStockCount); // Debugging log
+        setLowStockCount(response.data.lowStockCount);
+      })
+      .catch(error => {
+        console.error('Error fetching low stock count:', error);
+      });
+  }, []);
+
+  const renderStatCard = (title, value, description, icon, isAlert = false) => (
     <div style={styles.statCard}>
       <div style={styles.statCardTitle}>{title}</div>
-      <div style={styles.statCardValue}>{value}</div>
+      <div style={{ ...styles.statCardValue, ...(isAlert ? { color: 'red' } : {}) }}>{value}</div>
       <div style={styles.statCardDescription}>{description}</div>
       <div style={styles.statCardIcon}>{icon}</div>
     </div>
@@ -217,9 +254,9 @@ function App() {
 
         {/* Matrix Box Style for Top 4 */}
         <div style={styles.matrixGrid}>
-          {renderStatCard("Total Products", "3", "Active SKUs", <FaCube />)}
-          {renderStatCard("Inventory Value", "$13,700", "Total stock worth", <FaDollarSign />)}
-          {renderStatCard("Low Stock Alert", "0", "Items need reorder", <FaChartLine />)}
+          {renderStatCard("Total Products", productCount, "Active SKUs", <FaCube />)}
+          {renderStatCard("Inventory Value", `$${inventoryValue}`, "Total stock worth", <FaDollarSign />)}
+          {renderStatCard("Low Stock Alert", lowStockCount, "Items need reorder", <FaChartLine />, lowStockCount > 0)}
           {renderStatCard("Net Cash Flow", "$1,755", "This period", <FaRegFileAlt />)}
         </div>
 

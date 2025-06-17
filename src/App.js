@@ -36,7 +36,7 @@
 
 
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Product from './pages/Products';
 import Sales from './pages/Sales';
@@ -45,7 +45,7 @@ import Dashboard from './pages/Dashboard';
 import Topbar from './components/Topbar';
 import Login from './Authpages/login';
 import Signup from './Authpages/Signup';
-import OrderTable from './pages/Order';
+// import OrderTable from './pages/Order';
 
 // Protect private pages
 function PrivateRoute({ isAuthenticated, children }) {
@@ -58,11 +58,18 @@ function PublicRoute({ isAuthenticated, children }) {
 }
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    // Retrieve authentication state from localStorage, default to false if not set
+    return localStorage.getItem('isAuthenticated') === 'true' || false;
+  });
+
+  useEffect(() => {
+    // Update localStorage whenever authentication state changes
+    localStorage.setItem('isAuthenticated', isAuthenticated);
+  }, [isAuthenticated]);
 
   return (
     <Router>
-      {/* {isAuthenticated && <Sidebar />} */}
       {isAuthenticated && <Sidebar onLogout={() => setIsAuthenticated(false)} />}
 
       <div style={{ marginLeft: isAuthenticated ? '250px' : '0', flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -112,14 +119,6 @@ function App() {
                 </PrivateRoute>
               }
             />
-            {/* <Route
-              path="/order"
-              element={
-                <PrivateRoute isAuthenticated={isAuthenticated}>
-                  <OrderTable />
-                </PrivateRoute>
-              }
-            /> */}
             <Route
               path="/reports"
               element={
